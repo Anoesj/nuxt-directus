@@ -90,7 +90,7 @@ const onSubmit = async () => {
   }
 }
 
-const logUser = async () => {
+const logUser = () => {
   try {
     console.log(user)
     console.log(user.value.email)
