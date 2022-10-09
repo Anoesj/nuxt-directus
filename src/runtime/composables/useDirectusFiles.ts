@@ -1,5 +1,5 @@
 import { useRuntimeConfig } from '#app'
-import {
+import type {
   DirectusThumbnailOptions,
   DirectusFileRequest
 } from '../types'
