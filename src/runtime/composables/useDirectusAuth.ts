@@ -147,14 +147,6 @@ export const useDirectusAuth = () => {
     }, useStaticToken)
   }
 
-  // Alias for createUser
-  const register = async (
-    data: DirectusRegisterCredentials
-  // eslint-disable-next-line require-await
-  ): Promise<DirectusUser> => {
-    return createUser(data)
-  }
-
   const inviteUser = async (
     data: DirectusInviteCreation
   ): Promise<void> => {
@@ -213,7 +205,8 @@ export const useDirectusAuth = () => {
     resetPassword,
     logout,
     createUser,
-    register,
+    // Alias for createUser
+    register: createUser,
     inviteUser,
     acceptInvite,
     loginWithProvider,
