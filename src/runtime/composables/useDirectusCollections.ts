@@ -1,62 +1,72 @@
-import {
+import type {
+  DirectusCollections,
   DirectusCollectionCreation,
   DirectusCollectionRequest,
-  DirectusCollectionUpdate
+  DirectusCollectionUpdate,
+  DirectusCollectionInfo
 } from '../types'
 
 import { useDirectus } from './useDirectus'
 
-export const useDirectusCollections = () => {
+export const useDirectusCollections = <Collections extends DirectusCollections>() => {
   const directus = useDirectus()
 
-  const getCollections = async <T>(): Promise<T[]> => {
-    const collections = await directus<{ data: T[] }>('/collections/', {
+  async function getCollections (): Promise<DirectusCollectionInfo<Collections>[]> {
+    const collections = await directus<{
+      data: DirectusCollectionInfo<Collections>[];
+    }>('/collections/', {
       method: 'GET'
     })
+
     return collections.data
   }
 
-  const getCollection = async <T>(
-    data: DirectusCollectionRequest
-  ): Promise<T> => {
-    const collection = await directus<{ data: T }>(
-      `/collections/${data.collection}`,
-      {
-        method: 'GET'
-      }
-    )
+  async function getCollection<Data extends DirectusCollectionRequest<Collections>> (
+    data: Data
+  ): Promise<Extract<DirectusCollectionInfo<Collections>, { collection: Data['collection'] } >> {
+    const collection = await directus<{
+      data: Extract<DirectusCollectionInfo<Collections>, { collection: Data['collection'] }>;
+    }>(`/collections/${data.collection as string}`, {
+      method: 'GET'
+    })
+
     return collection.data
   }
 
-  const createCollection = async <T>(
-    data: DirectusCollectionCreation
-  ): Promise<T> => {
-    const collection = await directus<{ data: T }>('/collections', {
+  async function createCollection <Data extends DirectusCollectionCreation> (
+    data: Data
+  ): Promise<Data> {
+    const collection = await directus<{
+      data: Data;
+    }>('/collections', {
       method: 'POST',
       body: data
     })
+
     return collection.data
   }
 
-  const updateCollection = async <T>(
-    data: DirectusCollectionUpdate
-  ): Promise<T> => {
-    const collection = await directus<{ data: T }>(
-      `/collections/${data.collection}`,
-      {
-        method: 'PATCH',
-        body: {
-          meta: data.meta
-        }
+  async function updateCollection <Data extends DirectusCollectionUpdate<Collections>> (
+    data: Data
+  ): Promise<Data> {
+    const collection = await directus<{
+      data: Data;
+    }>(`/collections/${data.collection as string}`, {
+      method: 'PATCH',
+      body: {
+        meta: data.meta
       }
-    )
+    })
+
     return collection.data
   }
 
-  const deleteCollection = async <T>(
-    data: DirectusCollectionRequest
-  ): Promise<void> => {
-    await directus<{ data: T }>(`/collections/${data.collection}`, {
+  async function deleteCollection <Data extends DirectusCollectionRequest<Collections>> (
+    data: Data
+  ): Promise<void> {
+    await directus<{
+      data: Data;
+    }>(`/collections/${data.collection as string}`, {
       method: 'DELETE'
     })
   }
