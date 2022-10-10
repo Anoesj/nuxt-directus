@@ -16,7 +16,7 @@ import { useDirectusToken } from './useDirectusToken'
 import { useDirectusUrl } from './useDirectusUrl'
 import { useDirectusUser } from './useDirectusUser'
 
-export const useDirectusAuth = () => {
+export const useDirectusAuth = <User = DirectusUser>() => {
   const config = useRuntimeConfig()
   const directus = useDirectus()
   const baseUrl = useDirectusUrl()
@@ -35,11 +35,11 @@ export const useDirectusAuth = () => {
     refreshToken.value = null
   }
 
-  const setUser = (value: DirectusUser) => {
+  const setUser = (value: User): void => {
     user.value = value
   }
 
-  const fetchUser = async (useStaticToken?: boolean): Promise<Ref<DirectusUser>> => {
+  const fetchUser = async (useStaticToken?: boolean): Promise<Ref<User>> => {
     if (token.value) {
       try {
         if (config.public.directus.fetchUserParams?.filter) {
@@ -53,12 +53,12 @@ export const useDirectusAuth = () => {
           )
         }
         if (config.public.directus.fetchUserParams) {
-          const res = await directus<{ data: DirectusUser }>('/users/me', {
+          const res = await directus<{ data: User }>('/users/me', {
             params: config.public.directus.fetchUserParams
           }, useStaticToken)
           setUser(res.data)
         } else {
-          const res = await directus<{ data: DirectusUser }>('/users/me', {}, useStaticToken)
+          const res = await directus<{ data: User }>('/users/me', {}, useStaticToken)
           setUser(res.data)
         }
       } catch (e) {
@@ -110,7 +110,7 @@ export const useDirectusAuth = () => {
   const createUser = async (
     data: DirectusRegisterCredentials,
     useStaticToken?: boolean
-  ): Promise<DirectusUser> => {
+  ): Promise<User> => {
     return await directus('/users', {
       method: 'POST',
       body: data
