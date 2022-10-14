@@ -1,8 +1,4 @@
-export type ObjectWithOnlyStringKeys<V> = {
-  [key: string]: V;
-  [key: symbol]: never;
-  [key: number]: never;
-};
+type ArrayOfOrSingle<T> = T | T[];
 
 export type DirectusUser = {
   auth_data?: unknown | null;
@@ -28,7 +24,7 @@ export type DirectusUser = {
   [key: string]: any;
 } | null;
 
-export type DirectusCollections = ObjectWithOnlyStringKeys<Record<string, any>>;
+export type DirectusCollections = Record<string, Record<string, any>>;
 
 export interface DirectusQueryParamsMeta {
   total_count?: number;
@@ -39,12 +35,12 @@ export type DirectusQueryParamsMetaAll = '*';
 
 export interface DirectusQueryParams {
   fields?: Array<string>;
-  sort?: string | Array<string>;
+  sort?: ArrayOfOrSingle<string>;
   filter?: Record<string, unknown>;
   limit?: number;
   offset?: number;
   page?: number;
-  alias?: string | Array<string>;
+  alias?: ArrayOfOrSingle<string>;
   deep?: Record<string, unknown>;
   search?: string;
   meta?: keyof DirectusQueryParamsMeta | DirectusQueryParamsMetaAll;
@@ -74,34 +70,36 @@ export interface DirectusPasswordResetCredentials {
 }
 
 export type DirectusItemRequest<T extends DirectusCollections> = {
-  [K in keyof T]-?: {
-    collection: K;
-    id?: T[K]['id'];
+  [C in keyof T]-?: {
+    id?: T[C]['id'];
     params?: DirectusQueryParams;
-  }
-}[keyof T];
+  };
+};
+
+export type DirectusItemWithoutId<
+  T extends Record<string, any> = Record<string, any>
+> = {
+  [C in keyof Omit<T, 'id'>]: T[C];
+} & { id?: never; };
 
 export type DirectusItemCreation<T extends DirectusCollections> = {
-  [K in keyof T]-?: {
-    collection: K;
-    items: Omit<T[K], 'id'>| Array<Omit<T[K], 'id'>>;
-  }
-}[keyof T];
+  [C in keyof T]-?: {
+    items: ArrayOfOrSingle<DirectusItemWithoutId<T[C]>>;
+  };
+};
 
 export type DirectusItemUpdate<T extends DirectusCollections> = {
-  [K in keyof T]-?: {
-    collection: K;
-    id: T[K]['id'];
-    item: T[K];
-  }
-}[keyof T];
+  [C in keyof T]-?: {
+    id: T[C]['id'];
+    item: T[C];
+  };
+};
 
 export type DirectusItemDeletion<T extends DirectusCollections> = {
-  [K in keyof T]-?: {
-    collection: K;
-    items: T[K]['id'] | Array<T[K]['id']>;
-  }
-}[keyof T];
+  [C in keyof T]-?: {
+    items: ArrayOfOrSingle<T[C]['id']>;
+  };
+};
 
 // User Interfaces
 export interface DirectusUserRequest {
@@ -181,20 +179,16 @@ export interface DirectusNotificationObject {
   id?: number;
   timestamp?: string;
   status?: 'inbox' | 'archived';
-  recipient: Array<string> | string;
-  sender?: Array<string> | string;
+  recipient: string[] | string;
+  sender?: string[] | string;
   subject: string;
   message?: string;
   collection?: string;
   item?: string;
 }
 
-export interface DirectusCollectionRequest<T extends DirectusCollections> {
-  collection: keyof T;
-}
-
-export interface DirectusCollectionMeta<T extends DirectusCollections> {
-  collection?: keyof T;
+export interface DirectusCollectionMeta<T extends DirectusCollections, C extends keyof T> {
+  collection?: C;
   icon?: string;
   note?: string;
   display_template?: string;
@@ -217,28 +211,27 @@ export interface DirectusCollectionMeta<T extends DirectusCollections> {
 }
 
 export type DirectusCollectionInfo<T extends DirectusCollections> = {
-  [K in keyof T]-?: {
-    collection: K;
-    meta: DirectusCollectionMeta<T>;
+  [C in keyof T]-?: {
+    collection: C;
+    meta: DirectusCollectionMeta<T, C>;
     schema: {
-      name: K;
+      name: C;
       sql: string;
     };
-  }
-}[keyof T];
+  };
+};
 
 export interface DirectusCollectionCreation {
   collection: keyof DirectusCollections;
-  meta?: DirectusCollectionMeta<DirectusCollections>;
+  meta?: DirectusCollectionMeta<DirectusCollections, keyof DirectusCollections>;
   schema?: {
     name?: string;
     comment?: string;
   };
 }
 
-export interface DirectusCollectionUpdate<T extends DirectusCollections> {
-  collection: keyof T;
-  meta: DirectusCollectionMeta<T>;
+export interface DirectusCollectionUpdate<T extends DirectusCollections, C extends keyof T> {
+  meta: DirectusCollectionMeta<T, C>;
 }
 
 export interface DirectusRevision {
