@@ -21,7 +21,7 @@ export const useDirectusFiles = () => {
     return files.data;
   };
   const getThumbnail = (fileId, options) => {
-    const url = new URL(`${directusUrl}assets/${fileId}`);
+    const url = new URL(`${directusUrl}/assets/${fileId}`);
     if (options) {
       if (options.width) {
         url.searchParams.append("width", options.width.toFixed(0));
