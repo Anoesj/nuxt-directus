@@ -1,6 +1,5 @@
 import { useNuxtApp, useRuntimeConfig } from '#app'
-
-import type { FetchError, FetchOptions } from 'ohmyfetch'
+import type { FetchOptions } from 'ohmyfetch'
 import { useDirectusUrl } from './useDirectusUrl'
 import { useDirectusToken } from './useDirectusToken'
 
