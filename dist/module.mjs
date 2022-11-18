@@ -1,38 +1,38 @@
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { defineNuxtModule, addPlugin, addAutoImportDir } from '@nuxt/kit';
+import { defineNuxtModule, isNuxt2, addPlugin, addImportsDir } from '@nuxt/kit';
 
-function isObject(val) {
-  return val !== null && typeof val === "object";
+function isObject(value) {
+  return value !== null && typeof value === "object";
 }
-function _defu(baseObj, defaults, namespace = ".", merger) {
+function _defu(baseObject, defaults, namespace = ".", merger) {
   if (!isObject(defaults)) {
-    return _defu(baseObj, {}, namespace, merger);
+    return _defu(baseObject, {}, namespace, merger);
   }
-  const obj = Object.assign({}, defaults);
-  for (const key in baseObj) {
+  const object = Object.assign({}, defaults);
+  for (const key in baseObject) {
     if (key === "__proto__" || key === "constructor") {
       continue;
     }
-    const val = baseObj[key];
-    if (val === null || val === void 0) {
+    const value = baseObject[key];
+    if (value === null || value === void 0) {
       continue;
     }
-    if (merger && merger(obj, key, val, namespace)) {
+    if (merger && merger(object, key, value, namespace)) {
       continue;
     }
-    if (Array.isArray(val) && Array.isArray(obj[key])) {
-      obj[key] = val.concat(obj[key]);
-    } else if (isObject(val) && isObject(obj[key])) {
-      obj[key] = _defu(val, obj[key], (namespace ? `${namespace}.` : "") + key.toString(), merger);
+    if (Array.isArray(value) && Array.isArray(object[key])) {
+      object[key] = [...value, ...object[key]];
+    } else if (isObject(value) && isObject(object[key])) {
+      object[key] = _defu(value, object[key], (namespace ? `${namespace}.` : "") + key.toString(), merger);
     } else {
-      obj[key] = val;
+      object[key] = value;
     }
   }
-  return obj;
+  return object;
 }
 function createDefu(merger) {
-  return (...args) => args.reduce((p, c) => _defu(p, c, "", merger), {});
+  return (...arguments_) => arguments_.reduce((p, c) => _defu(p, c, "", merger), {});
 }
 const defu = createDefu();
 
@@ -50,19 +50,28 @@ const module = defineNuxtModule({
     autoFetch: true
   },
   setup(options, nuxt) {
-    nuxt.options.runtimeConfig.public.directus = defu(
-      nuxt.options.runtimeConfig.public.directus,
-      {
-        url: options.url,
-        autoFetch: options.autoFetch,
-        fetchUserParams: options.fetchUserParams,
-        token: options.token
-      }
-    );
+    if (isNuxt2() && !nuxt?.options?.runtimeConfig?.public?.directus) {
+      nuxt.options.publicRuntimeConfig.directus = defu(
+        nuxt.options.publicRuntimeConfig.directus,
+        {
+          url: options.url,
+          autoFetch: options.autoFetch,
+          fetchUserParams: options.fetchUserParams,
+          token: options.token
+        }
+      );
+    }
+    nuxt.options.runtimeConfig.public = nuxt.options.runtimeConfig.public || {};
+    nuxt.options.runtimeConfig.public.directus = defu(nuxt.options.runtimeConfig.directus, {
+      url: options.url,
+      autoFetch: options.autoFetch,
+      fetchUserParams: options.fetchUserParams,
+      token: options.token
+    });
     const runtimeDir = fileURLToPath(new URL("./runtime", import.meta.url));
     nuxt.options.build.transpile.push(runtimeDir);
     addPlugin(resolve(runtimeDir, "plugin"));
-    addAutoImportDir(resolve(runtimeDir, "composables"));
+    addImportsDir(resolve(runtimeDir, "composables"));
   }
 });
 

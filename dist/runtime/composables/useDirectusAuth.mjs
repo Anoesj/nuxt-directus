@@ -16,7 +16,7 @@ export const useDirectusAuth = () => {
     user.value = value;
   };
   const fetchUser = async () => {
-    if (token.value && !user.value) {
+    if (token.value) {
       try {
         if (config.directus.fetchUserParams?.filter) {
           config.directus.fetchUserParams.filter = JSON.stringify(
@@ -78,9 +78,10 @@ export const useDirectusAuth = () => {
       body: data
     });
   };
-  const logout = () => {
+  const logout = async () => {
     setToken(null);
     setUser(null);
+    await fetchUser();
   };
   return {
     setToken,

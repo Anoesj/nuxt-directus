@@ -7,4 +7,4 @@ declare module '@nuxt/schema' {
 }
 
 
-export { default } from './module'
+export { ModuleOptions, default } from './module'

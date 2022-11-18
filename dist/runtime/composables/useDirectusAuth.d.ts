@@ -7,7 +7,7 @@ export declare const useDirectusAuth: <User = DirectusUser>() => {
     login: (data: DirectusAuthCredentials) => Promise<DirectusAuthResponse<User>>;
     requestPasswordReset: (data: DirectusPasswordForgotCredentials) => Promise<void>;
     resetPassword: (data: DirectusPasswordResetCredentials) => Promise<void>;
-    logout: () => void;
+    logout: () => Promise<void>;
     createUser: (data: DirectusRegisterCredentials) => Promise<User>;
     register: (data: DirectusRegisterCredentials) => Promise<User>;
 };
