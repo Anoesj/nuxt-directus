@@ -179,7 +179,6 @@ export const useDirectusAuth = <User = DirectusUser>() => {
     register: createUser,
     inviteUser,
     acceptInvite,
-    main,
     loginWithProvider,
     setAuthCookies
   }
