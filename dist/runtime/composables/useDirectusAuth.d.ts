@@ -11,7 +11,6 @@ export declare const useDirectusAuth: <User = DirectusUser>() => {
     register: (data: DirectusRegisterCredentials, useStaticToken?: boolean) => Promise<User>;
     inviteUser: (data: DirectusInviteCreation) => Promise<void>;
     acceptInvite: (data: DirectusAcceptInvite) => Promise<void>;
-    main: any;
     loginWithProvider: (provider: string, redirectOnLogin?: string) => Promise<void>;
     setAuthCookies: (_token: string, _refreshToken: string, _expires: number) => void;
 };
