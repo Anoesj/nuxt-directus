@@ -5,7 +5,7 @@ export const useDirectusNotifications = () => {
   const directus = useDirectus()
 
   const getNotifications = async <T>(data: {
-    params: DirectusQueryParams;
+    params: DirectusQueryParams
   }): Promise<T[]> => {
     if (data.params?.filter) {
       (data.params.filter as unknown) = JSON.stringify(data.params.filter)
@@ -15,42 +15,42 @@ export const useDirectusNotifications = () => {
     }
     const notifications = await directus<{ data: T[] }>('/notifications', {
       method: 'GET',
-      params: data.params
+      params: data.params,
     })
     return notifications.data
   }
 
   const getNotificationByKey = async <T>(data: {
-    id: number;
-    params: DirectusQueryParams;
+    id: number
+    params: DirectusQueryParams
   }): Promise<T[]> => {
     const notifications = await directus<{ data: T[] }>(
       `/notifications/${data.id}`,
       {
         method: 'GET',
-        params: data.params
-      }
+        params: data.params,
+      },
     )
     return notifications.data
   }
 
   // A partial notification object.
   const createNotification = async <T>(data: {
-    notification: DirectusNotificationObject;
+    notification: DirectusNotificationObject
   }): Promise<T[]> => {
     const notification = await directus<{ data: T[] }>('/notifications', {
       method: 'POST',
-      body: data.notification
+      body: data.notification,
     })
     return notification.data
   }
 
   const deleteNotification = async (data: {
-    notifications: Array<string> | string;
+    notifications: Array<string> | string
   }): Promise<void> => {
     await directus<undefined>('/notifications', {
       method: 'DELETE',
-      body: data.notifications
+      body: data.notifications,
     })
   }
 
@@ -58,6 +58,6 @@ export const useDirectusNotifications = () => {
     getNotifications,
     getNotificationByKey,
     createNotification,
-    deleteNotification
+    deleteNotification,
   }
 }

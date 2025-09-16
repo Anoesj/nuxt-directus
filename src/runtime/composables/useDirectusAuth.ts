@@ -10,12 +10,13 @@ import type {
   DirectusPasswordForgotCredentials,
   DirectusPasswordResetCredentials,
   DirectusRegisterCredentials,
-  DirectusUser
+  DirectusUser,
 } from '../types'
 import { useDirectus } from './useDirectus'
 import { useDirectusToken } from './useDirectusToken'
 import { useDirectusUrl } from './useDirectusUrl'
 import { useDirectusUser } from './useDirectusUser'
+import type { ModuleOptions } from '../../module'
 
 export const useDirectusAuth = <User extends DirectusUser = DirectusUser>() => {
   const config = useRuntimeConfig()
@@ -43,27 +44,26 @@ export const useDirectusAuth = <User extends DirectusUser = DirectusUser>() => {
   const fetchUser = async (useStaticToken?: boolean): Promise<Ref<User>> => {
     if (token.value) {
       try {
-        if (config.public.directus.fetchUserParams?.filter) {
-          (config.public.directus.fetchUserParams.filter as unknown) = JSON.stringify(
-            config.public.directus.fetchUserParams.filter
-          )
+        const directusConfig = config.public.directus as ModuleOptions
+        if (directusConfig.fetchUserParams?.filter) {
+          (directusConfig.fetchUserParams.filter as unknown) = JSON.stringify(directusConfig.fetchUserParams.filter)
         }
-        if (config.public.directus.fetchUserParams?.deep) {
-          (config.public.directus.fetchUserParams.deep as unknown) = JSON.stringify(
-            config.public.directus.fetchUserParams.deep
-          )
+        if (directusConfig.fetchUserParams?.deep) {
+          (directusConfig.fetchUserParams.deep as unknown) = JSON.stringify(directusConfig.fetchUserParams.deep)
         }
-        if (config.public.directus.fetchUserParams) {
+        if (directusConfig.fetchUserParams) {
           const res = await directus<{ data: User }>('/users/me', {
-            params: config.public.directus.fetchUserParams
+            params: directusConfig.fetchUserParams,
           }, useStaticToken)
           setUser(res.data)
-        } else {
+        }
+        else {
           const res = await directus<{ data: User }>('/users/me', {}, useStaticToken)
           setUser(res.data)
         }
-      } catch (e) {
-        console.error("Couldn't fetch user", e)
+      }
+      catch (e) {
+        console.error('Couldn\'t fetch user', e)
       }
     }
     return user as Ref<User>
@@ -71,17 +71,20 @@ export const useDirectusAuth = <User extends DirectusUser = DirectusUser>() => {
 
   const login = async (
     data: DirectusAuthCredentials,
-    useStaticToken?: boolean
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    useStaticToken?: boolean,
   ): Promise<DirectusAuthResponse> => {
     removeTokens()
 
-    const response = await $fetch<{data: DirectusAuthResponse}>('/auth/login', {
+    const response = await $fetch<{ data: DirectusAuthResponse }>('/auth/login', {
       baseURL: baseUrl,
       body: data,
-      method: 'POST'
+      method: 'POST',
     })
 
-    if (!response.data.access_token) { throw new Error('Login failed, please check your credentials.') }
+    if (!response.data.access_token) {
+      throw new Error('Login failed, please check your credentials.')
+    }
 
     // Calculate new expires date, bug fix https://github.com/Intevel/nuxt-directus/issues/157
     const newExpires = (response.data.expires ?? 0) + new Date().getTime()
@@ -94,23 +97,27 @@ export const useDirectusAuth = <User extends DirectusUser = DirectusUser>() => {
       user: user.value,
       access_token: response.data.access_token,
       expires: newExpires,
-      refresh_token: response.data.refresh_token
+      refresh_token: response.data.refresh_token,
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const loginWithLdap = async (
     data: DirectusAuthLdapCredentials,
-    useStaticToken?: boolean
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    useStaticToken?: boolean,
   ): Promise<DirectusAuthResponse> => {
     removeTokens()
 
-    const response = await $fetch<{data: DirectusAuthResponse}>('/auth/login/ldap', {
+    const response = await $fetch<{ data: DirectusAuthResponse }>('/auth/login/ldap', {
       baseURL: baseUrl,
       body: data,
-      method: 'POST'
+      method: 'POST',
     })
 
-    if (!response.data.access_token) { throw new Error('LDAP Login failed, please check your credentials.') }
+    if (!response.data.access_token) {
+      throw new Error('LDAP Login failed, please check your credentials.')
+    }
 
     // Calculate new expires date, bug fix https://github.com/Intevel/nuxt-directus/issues/157
     const newExpires = (response.data.expires ?? 0) + new Date().getTime()
@@ -123,13 +130,13 @@ export const useDirectusAuth = <User extends DirectusUser = DirectusUser>() => {
       user: user.value,
       access_token: response.data.access_token,
       expires: newExpires,
-      refresh_token: response.data.refresh_token
+      refresh_token: response.data.refresh_token,
     }
   }
 
   const loginWithProvider = async (
     provider: string,
-    redirectOnLogin?: string
+    redirectOnLogin?: string,
   ) => {
     removeTokens()
     const route = useRoute()
@@ -139,49 +146,49 @@ export const useDirectusAuth = <User extends DirectusUser = DirectusUser>() => {
 
   const createUser = async (
     data: DirectusRegisterCredentials,
-    useStaticToken?: boolean
+    useStaticToken?: boolean,
   ): Promise<User> => {
     return await directus('/users', {
       method: 'POST',
-      body: data
+      body: data,
     }, useStaticToken)
   }
 
   const inviteUser = async (
-    data: DirectusInviteCreation
+    data: DirectusInviteCreation,
   ): Promise<void> => {
     return await directus('/users/invite', {
       method: 'POST',
-      body: data
+      body: data,
     })
   }
 
   const acceptInvite = async (
-    data: DirectusAcceptInvite
+    data: DirectusAcceptInvite,
   ): Promise<void> => {
     return await directus('/users/invite/accept', {
       method: 'POST',
-      body: data
+      body: data,
     })
   }
 
   const requestPasswordReset = async (
     data: DirectusPasswordForgotCredentials,
-    useStaticToken?: boolean
+    useStaticToken?: boolean,
   ): Promise<void> => {
     await directus('/auth/password/request', {
       method: 'POST',
-      body: data
+      body: data,
     }, useStaticToken)
   }
 
   const resetPassword = async (
     data: DirectusPasswordResetCredentials,
-    useStaticToken?: boolean
+    useStaticToken?: boolean,
   ): Promise<void> => {
     await directus('/auth/password/reset', {
       method: 'POST',
-      body: data
+      body: data,
     }, useStaticToken)
   }
 
@@ -189,7 +196,7 @@ export const useDirectusAuth = <User extends DirectusUser = DirectusUser>() => {
     await $fetch('/auth/logout', {
       baseURL: baseUrl,
       body: { refresh_token: refreshToken.value },
-      method: 'POST'
+      method: 'POST',
     })
 
     removeTokens()
@@ -210,6 +217,6 @@ export const useDirectusAuth = <User extends DirectusUser = DirectusUser>() => {
     inviteUser,
     acceptInvite,
     loginWithProvider,
-    setAuthCookies
+    setAuthCookies,
   }
 }

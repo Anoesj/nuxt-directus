@@ -4,7 +4,6 @@
   "license": "MIT",
   "repository": "https://github.com/intevel/nuxt-directus",
   "homepage": "https://nuxt-directus.de/",
-  "type": "module",
   "packageManager": "pnpm@10.16.1",
   "author": {
     "name": "Conner Luka Bachmann",
@@ -13,6 +12,7 @@
   "contributors": [
     "Intevel <github@conner-bachmann.de>"
   ],
+  "type": "module",
   "exports": {
     ".": {
       "import": "./dist/module.mjs",
@@ -32,19 +32,19 @@
   ],
   "scripts": {
     "prepack": "nuxt-module-build build",
-    "dev": "nuxi dev playground",
+    "dev": "pnpm dev:prepare && nuxi dev playground",
     "dev:build": "nuxi build playground",
-    "dev:prepare": "nuxt-module-build build --stub && nuxi prepare playground",
+    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
     "docs": "cd docs && pnpm dev",
-    "release": "nuxt-module-build && changelogen --release --minor --push && pnpm publish",
-    "lint": "eslint --ext .js,.ts,.vue"
+    "release": "pnpm lint && pnpm prepack && changelogen --release --minor --push && pnpm publish && git push --follow-tags",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@nuxt/kit": "^4.1.2"
   },
   "devDependencies": {
     "@nuxt/devtools": "^2.6.3",
-    "@nuxt/eslint": "latest",
+    "@nuxt/eslint-config": "latest",
     "@nuxt/module-builder": "latest",
     "@types/node": "^24.5.0",
     "changelogen": "^0.6.2",

@@ -1,10 +1,13 @@
-import withNuxt from './playground/.nuxt/eslint.config.mjs'
+import { createConfigForNuxt } from '@nuxt/eslint-config'
 
-export default withNuxt(
+export default createConfigForNuxt(
   {
-    files: ['**/*.ts', '**/*.tsx'],
+    features: {
+      stylistic: true,
+    },
+    files: ['**/*.ts'],
     rules: {
-      "@typescript-eslint/no-unused-vars": 'off',
-    }
+      '@typescript-eslint/no-unused-vars': 'off',
+    },
   },
 )

@@ -13,35 +13,35 @@ export interface ModuleOptions {
    * @default process.env.NUXT_PUBLIC_DIRECTUS_URL
    * @type string
    */
-  url?: string;
+  url?: string
   /**
    * Auto fetch user
    * @default true
    * @type boolean
    */
-  autoFetch?: boolean;
+  autoFetch?: boolean
   /**
    * Auto refesh tokens
    * @default true
    * @type boolean
    */
-  autoRefresh?: boolean;
+  autoRefresh?: boolean
   /**
    * Auto refesh tokens
    * @default true
    * @type boolean
    */
-  onAutoRefreshFailure?: () => Promise<void>;
+  onAutoRefreshFailure?: () => Promise<void>
   /**
    * fetch user params
    * @type boolean
    */
-  fetchUserParams?: DirectusQueryParams;
+  fetchUserParams?: DirectusQueryParams
   /**
    * Auth Token
    * @type string
    */
-  token?: string;
+  token?: string
   /**
    * Add Directus Admin Dashboard in Nuxt Devtools
    *
@@ -53,13 +53,13 @@ export interface ModuleOptions {
    * @type string
    * @ default 'directus_token'
    */
-  cookieNameToken?: string;
+  cookieNameToken?: string
   /**
    * Refresh Token Cookie Name
    * @type string
    * @default 'directus_refresh_token'
    */
-  cookieNameRefreshToken?: string;
+  cookieNameRefreshToken?: string
 
   /**
    * The max age for auth cookies in milliseconds.
@@ -67,7 +67,7 @@ export interface ModuleOptions {
    * @type string
    * @default 604800000
    */
-  cookieMaxAge?: number;
+  cookieMaxAge?: number
 
   /**
    * The max age for auth cookies in milliseconds.
@@ -75,21 +75,21 @@ export interface ModuleOptions {
    * @type string
    * @default 604800000
    */
-  maxAgeRefreshToken?: number;
+  maxAgeRefreshToken?: number
 
   /**
    * The SameSite attribute for auth cookies.
    * @type string
    * @default 'lax'
    */
-  cookieSameSite?: 'strict' | 'lax' | 'none' | undefined;
+  cookieSameSite?: 'strict' | 'lax' | 'none' | undefined
 
   /**
    * The Secure attribute for auth cookies.
    * @type boolean
    * @default false
    */
-  cookieSecure?: boolean;
+  cookieSecure?: boolean
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -98,7 +98,7 @@ export default defineNuxtModule<ModuleOptions>({
     configKey: 'directus',
     compatibility: {
       nuxt: '>=3.0.0',
-    }
+    },
   },
   defaults: {
     url: process.env.NUXT_PUBLIC_DIRECTUS_URL,
@@ -111,12 +111,12 @@ export default defineNuxtModule<ModuleOptions>({
     // Nuxt Cookies Docs @ https://nuxt.com/docs/api/composables/use-cookie
     cookieMaxAge: 604800000,
     cookieSameSite: 'lax',
-    cookieSecure: false
+    cookieSecure: false,
   },
-  setup (options, nuxt) {
+  setup(options, nuxt) {
     nuxt.options.runtimeConfig.public = nuxt.options.runtimeConfig.public || {}
     nuxt.options.runtimeConfig.public.directus = defu(
-      nuxt.options.runtimeConfig.public.directus,
+      nuxt.options.runtimeConfig.public.directus as ModuleOptions,
       {
         url: options.url,
         autoFetch: options.autoFetch,
@@ -129,7 +129,7 @@ export default defineNuxtModule<ModuleOptions>({
         cookieNameRefreshToken: options.cookieNameRefreshToken,
         cookieMaxAge: options.cookieMaxAge || options.maxAgeRefreshToken,
         cookieSameSite: options.cookieSameSite,
-        cookieSecure: options.cookieSecure
+        cookieSecure: options.cookieSecure,
       })
 
     const runtimeDir = fileURLToPath(new URL('./runtime', import.meta.url))
@@ -139,12 +139,13 @@ export default defineNuxtModule<ModuleOptions>({
     addImportsDir(resolve(runtimeDir, 'composables'))
     if (options.maxAgeRefreshToken) {
       console.warn(
-        'maxAgeRefreshToken is deprecated, please use cookieMaxAge instead'
+        'maxAgeRefreshToken is deprecated, please use cookieMaxAge instead',
       )
     }
 
     if (options.devtools) {
-      const adminUrl = joinURL(nuxt.options.runtimeConfig.public.directus.url, '/admin/')
+      const adminUrl = joinURL((nuxt.options.runtimeConfig.public.directus as ModuleOptions).url!, '/admin/')
+      // @ts-expect-error -- Nuxt types wrong?
       nuxt.hook('devtools:customTabs', (iframeTabs) => {
         iframeTabs.push({
           name: 'directus',
@@ -152,19 +153,19 @@ export default defineNuxtModule<ModuleOptions>({
           icon: 'simple-icons:directus',
           view: {
             type: 'iframe',
-            src: adminUrl
-          }
+            src: adminUrl,
+          },
         })
       })
     }
-  }
+  },
 })
 
 declare module '@nuxt/schema' {
   interface ConfigSchema {
-    directus?: ModuleOptions;
+    directus?: ModuleOptions
     publicRuntimeConfig?: {
-      directus?: ModuleOptions;
-    };
+      directus?: ModuleOptions
+    }
   }
 }

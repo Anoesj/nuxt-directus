@@ -1,61 +1,63 @@
-import type { CookieRef} from '#app';
+import type { CookieRef } from '#app'
 import { useCookie, useNuxtApp, useRuntimeConfig } from '#app'
 import { computed } from 'vue'
 import type { DirectusAuthResponse } from '../types'
 import { useDirectusUrl } from './useDirectusUrl'
+import type { ModuleOptions } from '../../module'
 
 export const useDirectusToken = () => {
   const nuxtApp = useNuxtApp()
   const baseUrl = useDirectusUrl()
-  const config = useRuntimeConfig().public
+  const config = useRuntimeConfig().public as { directus: ModuleOptions }
 
   /**
    * Get or set cookie.
    * @param name
    * @private
    */
-  const _getOrSetCookie = (name: string) => {
+  const _getOrSetCookie = <T>(name: string) => {
     nuxtApp._cookies = nuxtApp._cookies || {}
     if (nuxtApp._cookies[name]) {
-      return nuxtApp._cookies[name]
+      return nuxtApp._cookies[name] as CookieRef<T>
     }
 
-    const cookie = useCookie<string | null>(name, {
+    const cookie = useCookie<T>(name, {
       maxAge: config.directus.cookieMaxAge,
       sameSite: config.directus.cookieSameSite,
-      secure: config.directus.cookieSecure
+      secure: config.directus.cookieSecure,
     })
     nuxtApp._cookies[name] = cookie
     return cookie
   }
 
-  const token = (): CookieRef<string | null> => {
-    return _getOrSetCookie(config.directus.cookieNameToken)
+  const token = () => {
+    return _getOrSetCookie<string | null>(config.directus.cookieNameToken!)
   }
 
-  const refreshToken = (): CookieRef<string | null> => {
-    return _getOrSetCookie(config.directus.cookieNameRefreshToken)
+  const refreshToken = () => {
+    return _getOrSetCookie<string | null>(config.directus.cookieNameRefreshToken!)
   }
 
-  const expires = (): CookieRef<number | null> => {
-    return _getOrSetCookie('directus_token_expired_at')
+  const expires = () => {
+    return _getOrSetCookie<number | null>('directus_token_expired_at')
   }
 
   const refreshTokens = async (): Promise<DirectusAuthResponse | null> => {
     if (refreshToken() && refreshToken().value) {
       const body = {
-        refresh_token: refreshToken().value
+        refresh_token: refreshToken().value,
       }
       const data = await $fetch<{ data: DirectusAuthResponse }>('/auth/refresh', {
         baseURL: baseUrl,
         body,
-        method: 'POST'
+        method: 'POST',
       })
       expires().value = new Date().getTime() + data.data.expires
       token().value = data.data.access_token
       refreshToken().value = data.data.refresh_token
       return data.data
-    } else {
+    }
+    else {
       return null
     }
   }
@@ -69,7 +71,8 @@ export const useDirectusToken = () => {
       if (token_expired.value) {
         try {
           await refreshTokens()
-        } catch (e) {
+        }
+        catch {
           refreshToken().value = null
           if (config.directus.onAutoRefreshFailure) {
             await config.directus.onAutoRefreshFailure()
@@ -86,6 +89,6 @@ export const useDirectusToken = () => {
     token_expires_in,
     token_expired,
     refreshTokens,
-    checkAutoRefresh
+    checkAutoRefresh,
   }
 }

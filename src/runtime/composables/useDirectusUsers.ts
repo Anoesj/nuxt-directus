@@ -4,7 +4,7 @@ import type {
   DirectusUserUpdate,
   DirectusUserDeletion,
   DirectusItems,
-  DirectusUser
+  DirectusUser,
 } from '../types'
 import { useDirectus } from './useDirectus'
 
@@ -20,12 +20,13 @@ export const useDirectusUsers = () => {
     }
     const users = await directus<DirectusItems<T>>('/users', {
       method: 'GET',
-      params: data?.params
+      params: data?.params,
     })
 
     if (users?.meta) {
       return { meta: users.meta, data: users.data }
-    } else {
+    }
+    else {
       return users?.data
     }
   }
@@ -39,17 +40,17 @@ export const useDirectusUsers = () => {
     }
     const user = await directus<{ data: T }>(`/users/${data.id}`, {
       method: 'GET',
-      params: data.params
+      params: data.params,
     })
     return user.data
   }
 
   const createUsers = async <T>(
-    data: DirectusUserCreation
+    data: DirectusUserCreation,
   ): Promise<T | T[]> => {
     const users = await directus<{ data: T[] }>('/users', {
       method: 'POST',
-      body: data.users
+      body: data.users,
     })
     return users.data
   }
@@ -57,14 +58,14 @@ export const useDirectusUsers = () => {
   const deleteUsers = async (data: DirectusUserDeletion): Promise<void> => {
     await directus<undefined>('/users', {
       method: 'DELETE',
-      body: data.users
+      body: data.users,
     })
   }
 
   const updateUser = async <T>(data: DirectusUserUpdate): Promise<T> => {
     const user = await directus<{ data: T }>(`/users/${data.id}`, {
       method: 'PATCH',
-      body: data.user
+      body: data.user,
     })
     return user.data
   }
@@ -74,6 +75,6 @@ export const useDirectusUsers = () => {
     getUserById,
     createUsers,
     deleteUsers,
-    updateUser
+    updateUser,
   }
 }

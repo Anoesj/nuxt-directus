@@ -1,14 +1,11 @@
-import NuxtDirectus from '..'
-
 export default defineNuxtConfig({
   modules: [
-    NuxtDirectus,
+    '../src/module',
     '@nuxt/devtools',
-    '@nuxt/eslint',
   ],
   directus: {
     url: 'http://localhost:8055/',
     devtools: true,
     maxAgeRefreshToken: 10000,
-  }
+  },
 })

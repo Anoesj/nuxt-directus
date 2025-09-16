@@ -59,7 +59,7 @@
 <script setup lang="ts">
 import type { DirectusUser, DirectusUserRequest, DirectusUserUpdate } from '../../src/runtime/types'
 
-interface News {
+type News = {
   id?: string | number;
   title: string;
   content: string;
@@ -67,7 +67,7 @@ interface News {
 }
 
 // TODO: I cannot reach the backend at this moment, so I cannot check what Collections exist in there
-interface Books {
+type Books = {
   id?: string | number;
   title: string;
   pages: number;
@@ -92,7 +92,7 @@ type DirectusCollections = {
 
 type AllCollections = Collections & DirectusCollections;
 
-const { login } = useDirectusAuth()
+const { login, loginWithProvider, logout } = useDirectusAuth()
 const user = useDirectusUser()
 const { getItems, getItemById, createItems, deleteItems } = useDirectusItems<AllCollections>()
 const { getCollections, getCollection } = useDirectusCollections<AllCollections>()
@@ -103,7 +103,7 @@ const {
   deleteUsers,
   getUserById,
   getUsers,
-  updateUser
+  updateUser,
 } = useDirectusUsers()
 
 let articleIds: (string | number | undefined)[] = []
