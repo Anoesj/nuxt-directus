@@ -53,7 +53,7 @@ export const useDirectusFiles = () => {
   const uploadFiles = async (fileData, options = {}) => {
     try {
       const formData = new FormData();
-      
+
       if (Array.isArray(fileData)) {
         fileData.forEach((file) => {
           formData.append('file[]', file);

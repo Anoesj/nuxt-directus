@@ -1,6 +1,7 @@
-import { useCookie, useNuxtApp, CookieRef, useRuntimeConfig } from '#app'
+import type { CookieRef} from '#app';
+import { useCookie, useNuxtApp, useRuntimeConfig } from '#app'
 import { computed } from 'vue'
-import { DirectusAuthResponse } from '../types'
+import type { DirectusAuthResponse } from '../types'
 import { useDirectusUrl } from './useDirectusUrl'
 
 export const useDirectusToken = () => {

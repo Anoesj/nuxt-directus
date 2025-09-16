@@ -48,7 +48,7 @@ export const useDirectusNotifications = () => {
   const deleteNotification = async (data: {
     notifications: Array<string> | string;
   }): Promise<void> => {
-    await directus<void>('/notifications', {
+    await directus<undefined>('/notifications', {
       method: 'DELETE',
       body: data.notifications
     })

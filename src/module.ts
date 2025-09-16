@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url'
 import { defu } from 'defu'
 import { defineNuxtModule, addPlugin, addImportsDir } from '@nuxt/kit'
 import { joinURL } from 'ufo'
-import { DirectusQueryParams } from './runtime/types'
+import type { DirectusQueryParams } from './runtime/types'
 
 export type * from './runtime/types'
 
@@ -97,8 +97,7 @@ export default defineNuxtModule<ModuleOptions>({
     name: 'nuxt-directus',
     configKey: 'directus',
     compatibility: {
-      nuxt: '>=3.0.0-rc.9 || ^2.16.0',
-      bridge: true
+      nuxt: '>=3.0.0',
     }
   },
   defaults: {
@@ -139,7 +138,6 @@ export default defineNuxtModule<ModuleOptions>({
     addPlugin(resolve(runtimeDir, 'plugin'))
     addImportsDir(resolve(runtimeDir, 'composables'))
     if (options.maxAgeRefreshToken) {
-      // eslint-disable-next-line no-console
       console.warn(
         'maxAgeRefreshToken is deprecated, please use cookieMaxAge instead'
       )
@@ -147,7 +145,6 @@ export default defineNuxtModule<ModuleOptions>({
 
     if (options.devtools) {
       const adminUrl = joinURL(nuxt.options.runtimeConfig.public.directus.url, '/admin/')
-      // @ts-expect-error - private API
       nuxt.hook('devtools:customTabs', (iframeTabs) => {
         iframeTabs.push({
           name: 'directus',

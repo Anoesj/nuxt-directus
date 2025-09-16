@@ -17,7 +17,7 @@ import { useDirectusToken } from './useDirectusToken'
 import { useDirectusUrl } from './useDirectusUrl'
 import { useDirectusUser } from './useDirectusUser'
 
-export const useDirectusAuth = <User = DirectusUser>() => {
+export const useDirectusAuth = <User extends DirectusUser = DirectusUser>() => {
   const config = useRuntimeConfig()
   const directus = useDirectus()
   const baseUrl = useDirectusUrl()
@@ -36,7 +36,7 @@ export const useDirectusAuth = <User = DirectusUser>() => {
     refreshToken.value = null
   }
 
-  const setUser = (value: User): void => {
+  const setUser = (value: User | null): void => {
     user.value = value
   }
 
@@ -66,7 +66,7 @@ export const useDirectusAuth = <User = DirectusUser>() => {
         console.error("Couldn't fetch user", e)
       }
     }
-    return user
+    return user as Ref<User>
   }
 
   const login = async (

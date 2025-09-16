@@ -1,6 +1,3 @@
 {
-  "compilerOptions": {
-    "moduleResolution": "node",
-    "module": "ESNext"
-  }
+  "extends": "./playground/.nuxt/tsconfig.json",
 }

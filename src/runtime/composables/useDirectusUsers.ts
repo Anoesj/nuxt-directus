@@ -1,4 +1,4 @@
-import {
+import type {
   DirectusUserRequest,
   DirectusUserCreation,
   DirectusUserUpdate,
@@ -55,7 +55,7 @@ export const useDirectusUsers = () => {
   }
 
   const deleteUsers = async (data: DirectusUserDeletion): Promise<void> => {
-    await directus<void>('/users', {
+    await directus<undefined>('/users', {
       method: 'DELETE',
       body: data.users
     })

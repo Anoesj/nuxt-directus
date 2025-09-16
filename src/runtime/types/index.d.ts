@@ -21,10 +21,10 @@ export type DirectusUser = {
   theme?: string | null;
   title?: string | null;
   token?: string | null;
-  [key: string]: any;
+  [key: string]: unknown;
 } | null;
 
-export type DirectusCollections = Record<string, Record<string, any>>;
+export type DirectusCollections = Record<string, Record<string, unknown>>;
 
 export interface DirectusQueryParamsMeta {
   total_count?: number;
@@ -83,7 +83,7 @@ export type DirectusItemRequest<T extends DirectusCollections> = {
 };
 
 export type DirectusItemWithoutId<
-  T extends Record<string, any> = Record<string, any>
+  T extends Record<string, unknown> = Record<string, unknown>
 > = {
   [C in keyof Omit<T, 'id'>]: T[C];
 } & { id?: never; };
@@ -116,12 +116,12 @@ export interface DirectusUserRequest {
 }
 
 export interface DirectusUserCreation {
-  users: Array<Object> | Object;
+  users: Array<object> | object;
 }
 
 export interface DirectusUserUpdate {
   id: string;
-  user: Object;
+  user: object;
 }
 
 export interface DirectusUserDeletion {
@@ -169,7 +169,7 @@ export type DirectusFile = {
   uploaded_by?: string | DirectusUser | null;
   uploaded_on: string;
   width?: number | null;
-  [key: string]: any;
+  [key: string]: unknown;
 } | null;
 
 export type DirectusFolders = {
@@ -244,12 +244,12 @@ export interface DirectusCollectionUpdate<T extends DirectusCollections, C exten
 
 export interface DirectusRevision {
   id: number;
-  activity?: any;
+  activity?: unknown;
   collection: string; // FIXME:
   item?: string;
-  data?: Object;
-  delta?: Object;
-  parent?: any;
+  data?: object;
+  delta?: object;
+  parent?: unknown;
 }
 
 export interface DirectusItemMetadata {

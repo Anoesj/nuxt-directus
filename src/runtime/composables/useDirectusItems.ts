@@ -144,7 +144,7 @@ export const useDirectusItems = <Collections extends DirectusCollections>() => {
     collection: C,
     data: D
   ): Promise<void> {
-    await directus<void>(`/items/${collection as string}`, {
+    await directus<undefined>(`/items/${collection as string}`, {
       method: 'DELETE',
       body: data.items
     })
